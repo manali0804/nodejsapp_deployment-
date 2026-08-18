@@ -67,8 +67,8 @@ pipeline {
                     kubectl apply -f k8s-deploy/deployment.yaml
                     kubectl apply -f k8s-deploy/service.yaml
 
-                    kubectl set image deployment/nodejsapp \
-                    nodejsapp=${DOCKER_IMAGE}:${IMAGE_TAG}
+                    kubectl set image deployment/simple-node-app \
+                    simple-node-app=${DOCKER_IMAGE}:${IMAGE_TAG}
 
                     kubectl rollout status deployment/nodejsapp
                 """
