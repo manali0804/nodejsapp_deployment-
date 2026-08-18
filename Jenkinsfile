@@ -1,9 +1,8 @@
 pipeline {
-
     agent any
 
     environment {
-        IMAGE_NAME = "devops-api"
+        IMAGE_NAME = "manalitekawade0804/devops-api"
         IMAGE_TAG  = "1.0"
         NAMESPACE  = "devops-demo"
     }
@@ -20,7 +19,6 @@ pipeline {
         stage('Test') {
             steps {
                 echo 'Running application tests...'
-
                 sh '''
                     python3 -m py_compile app.py
                 '''
@@ -30,10 +28,9 @@ pipeline {
         stage('Docker Build') {
             steps {
                 echo 'Building Docker image...'
-
                 sh '''
                     docker build --network=host \
-                    -t ${IMAGE_NAME}:${IMAGE_TAG} .
+                        -t ${IMAGE_NAME}:${IMAGE_TAG} .
                 '''
             }
         }
@@ -41,9 +38,38 @@ pipeline {
         stage('Docker Test') {
             steps {
                 echo 'Verifying Docker image...'
-
                 sh '''
                     docker image inspect ${IMAGE_NAME}:${IMAGE_TAG}
+                '''
+            }
+        }
+
+        stage('Docker Login') {
+            steps {
+                echo 'Logging in to Docker Hub...'
+
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'dockerhubcred',
+                        usernameVariable: 'DOCKER_USER',
+                        passwordVariable: 'DOCKER_PASS'
+                    )
+                ]) {
+                    sh '''
+                        echo "$DOCKER_PASS" | docker login \
+                            -u "$DOCKER_USER" \
+                            --password-stdin
+                    '''
+                }
+            }
+        }
+
+        stage('Docker Push') {
+            steps {
+                echo 'Pushing Docker image to Docker Hub...'
+
+                sh '''
+                    docker push ${IMAGE_NAME}:${IMAGE_TAG}
                 '''
             }
         }
@@ -66,8 +92,8 @@ pipeline {
 
                 sh '''
                     kubectl rollout status deployment/devops-api \
-                    -n ${NAMESPACE} \
-                    --timeout=120s
+                        -n ${NAMESPACE} \
+                        --timeout=120s
 
                     kubectl get pods -n ${NAMESPACE}
                     kubectl get service -n ${NAMESPACE}
@@ -77,7 +103,6 @@ pipeline {
     }
 
     post {
-
         success {
             echo 'Deployment completed successfully!'
         }
