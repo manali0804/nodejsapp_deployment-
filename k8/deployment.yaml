@@ -1,19 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
+
 metadata:
   name: devops-api
   namespace: devops-demo
-  labels:
-    app: devops-api
 
 spec:
   replicas: 2
-
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxUnavailable: 0
-      maxSurge: 1
 
   selector:
     matchLabels:
@@ -27,8 +20,9 @@ spec:
     spec:
       containers:
         - name: devops-api
-          image: devops-api:1.0
-          imagePullPolicy: IfNotPresent
+          image: manalitekawade0804/devops-api:1.0
+
+          imagePullPolicy: Always
 
           ports:
             - containerPort: 5000
@@ -41,16 +35,16 @@ spec:
               cpu: "500m"
               memory: "256Mi"
 
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: 5000
-            initialDelaySeconds: 10
-            periodSeconds: 10
-
           readinessProbe:
             httpGet:
-              path: /ready
+              path: /
               port: 5000
             initialDelaySeconds: 5
-            periodSeconds: 5
+            periodSeconds: 10
+
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 5000
+            initialDelaySeconds: 15
+            periodSeconds: 20
