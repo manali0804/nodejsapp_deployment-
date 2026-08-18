@@ -53,9 +53,9 @@ pipeline {
                 echo 'Deploying application to Kubernetes...'
 
                 sh '''
-                    kubectl apply -f k8s/namespace.yaml
-                    kubectl apply -f k8s/deployment.yaml
-                    kubectl apply -f k8s/service.yaml
+                    kubectl apply -f k8/namespace.yaml
+                    kubectl apply -f k8/deployment.yaml
+                    kubectl apply -f k8/service.yaml
                 '''
             }
         }
