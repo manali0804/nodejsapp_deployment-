@@ -1,28 +1,28 @@
-ipipeline {
+pipeline {
 
     agent any
 
     environment {
-        DOCKER_IMAGE = "YOUR_DOCKERHUB_USERNAME/devops-app"
-        DOCKER_TAG   = "${BUILD_NUMBER}"
+        DOCKER_IMAGE = "manalitekawade0804/nodejsapp"
+        IMAGE_TAG = "${BUILD_NUMBER}"
     }
 
     stages {
 
         stage('Checkout') {
             steps {
-                echo "Checking out source code..."
+                echo 'Checking out code from GitHub...'
                 checkout scm
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                echo "Building Docker image..."
+                echo 'Building Docker image...'
 
                 sh """
                     docker build \
-                    -t ${DOCKER_IMAGE}:${DOCKER_TAG} \
+                    -t ${DOCKER_IMAGE}:${IMAGE_TAG} \
                     -t ${DOCKER_IMAGE}:latest .
                 """
             }
@@ -30,7 +30,7 @@ ipipeline {
 
         stage('Docker Login') {
             steps {
-                echo "Logging into Docker Hub..."
+                echo 'Logging into Docker Hub...'
 
                 withCredentials([
                     usernamePassword(
@@ -50,10 +50,10 @@ ipipeline {
 
         stage('Push Docker Image') {
             steps {
-                echo "Pushing Docker image to Docker Hub..."
+                echo 'Pushing image to Docker Hub...'
 
                 sh """
-                    docker push ${DOCKER_IMAGE}:${DOCKER_TAG}
+                    docker push ${DOCKER_IMAGE}:${IMAGE_TAG}
                     docker push ${DOCKER_IMAGE}:latest
                 """
             }
@@ -61,16 +61,16 @@ ipipeline {
 
         stage('Deploy to Kubernetes') {
             steps {
-                echo "Deploying application to Kubernetes..."
+                echo 'Deploying application to Kubernetes...'
 
                 sh """
                     kubectl apply -f k8s/deployment.yaml
                     kubectl apply -f k8s/service.yaml
 
-                    kubectl set image deployment/devops-app \
-                    devops-app=${DOCKER_IMAGE}:${DOCKER_TAG}
+                    kubectl set image deployment/nodejsapp \
+                    nodejsapp=${DOCKER_IMAGE}:${IMAGE_TAG}
 
-                    kubectl rollout status deployment/devops-app
+                    kubectl rollout status deployment/nodejsapp
                 """
             }
         }
@@ -79,12 +79,14 @@ ipipeline {
     post {
 
         success {
+            echo "===================================="
             echo "Pipeline completed successfully!"
-            echo "Docker Image: ${DOCKER_IMAGE}:${DOCKER_TAG}"
+            echo "Docker Image: ${DOCKER_IMAGE}:${IMAGE_TAG}"
+            echo "===================================="
         }
 
         failure {
-            echo "Pipeline failed. Check Jenkins console logs."
+            echo "Pipeline failed. Check Jenkins console output."
         }
 
         always {
