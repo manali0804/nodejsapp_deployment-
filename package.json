@@ -1,14 +1,11 @@
 {
-  "name": "project-assesment",
+  "name": "simple-node-app",
   "version": "1.0.0",
-  "description": "",
+  "description": "Simple Node.js application for DevOps challenge",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node app.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "express": "^5.2.1"
   }
