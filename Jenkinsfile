@@ -64,8 +64,8 @@ pipeline {
                 echo 'Deploying application to Kubernetes...'
 
                 sh """
-                    kubectl apply -f k8s/deployment.yaml
-                    kubectl apply -f k8s/service.yaml
+                    kubectl apply -f k8s-deploy/deployment.yaml
+                    kubectl apply -f k8s-deploy/service.yaml
 
                     kubectl set image deployment/nodejsapp \
                     nodejsapp=${DOCKER_IMAGE}:${IMAGE_TAG}
